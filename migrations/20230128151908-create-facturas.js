@@ -10,7 +10,11 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       cuit: {
-        type: Sequelize.BIGINT
+        type: Sequelize.BIGINT,
+        references:{
+          model: 'clientes',
+          key: 'cuit'
+        }
       },
       ptoVenta: {
         type: Sequelize.INTEGER
@@ -44,6 +48,10 @@ module.exports = {
         type: Sequelize.DATE
       },
       updatedAt: {
+        allowNull: false,
+        type: Sequelize.DATE
+      },
+      deletedAt: {
         allowNull: false,
         type: Sequelize.DATE
       }

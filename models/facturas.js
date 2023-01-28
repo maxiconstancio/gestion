@@ -27,6 +27,7 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     sequelize,
     modelName: 'Facturas',
+    paranoid: true,
   });
   return Facturas;
 };
