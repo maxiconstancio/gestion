@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Factura</title>
+    <!-- Agregando estilos de Tailwind -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.tailwindcss.com/css/tailwind.min.css"
+    />
+  </head>
+  <body class="bg-white p-8">
+    <h1 class="text-3xl font-bold mb-8">Factura</h1>
+    <p class="mb-4">Fecha: {{ fecha }}</p>
+    <table class="table-auto w-full mb-8">
+      <thead>
+        <tr>
+          <th class="px-4 py-2">Producto</th>
+          <th class="px-4 py-2">Cantidad</th>
+          <th class="px-4 py-2">Precio unitario</th>
+          <th class="px-4 py-2">Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each productos}}
+        <tr>
+          <td class="border px-4 py-2">{{ this.nombre }}</td>
+          <td class="border px-4 py-2">{{ this.cantidad }}</td>
+          <td class="border px-4 py-2">{{ this.precioUnitario }}</td>
+          <td class="border px-4 py-2">{{ this.total }}</td>
+        </tr>
+        {{/each}}
+      </tbody>
+    </table>
+    <p class="text-right">Total: {{ total }}</p>
+  </body>
+</html>

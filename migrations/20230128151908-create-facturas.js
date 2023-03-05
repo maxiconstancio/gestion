@@ -13,7 +13,14 @@ module.exports = {
         type: Sequelize.BIGINT,
         references:{
           model: 'clientes',
-          key: 'cuit'
+          key: 'cuit',
+        }
+      },
+      ClienteId: {
+        type: Sequelize.INTEGER,
+        references:{
+          model: 'clientes',
+          key: 'id',
         }
       },
       ptoVenta: {
@@ -28,6 +35,12 @@ module.exports = {
       neto: {
         type: Sequelize.DOUBLE
       },
+      /* IVA21: {
+        type: Sequelize.DOUBLE
+      },
+      IVA105: {
+        type: Sequelize.DOUBLE
+      },
       imp1: {
         type: Sequelize.DOUBLE
       },
@@ -36,12 +49,17 @@ module.exports = {
       },
       imp3: {
         type: Sequelize.DOUBLE
-      },
+      },*/
       total: {
         type: Sequelize.DOUBLE
       },
+      detalle: {
+        type: Sequelize.JSON
+      },
       CAE: {
         type: Sequelize.BIGINT
+      },CAEVto: {
+        type: Sequelize.DATE
       },
       createdAt: {
         allowNull: false,
@@ -52,7 +70,7 @@ module.exports = {
         type: Sequelize.DATE
       },
       deletedAt: {
-        allowNull: false,
+        allowNull: true,
         type: Sequelize.DATE
       }
     });

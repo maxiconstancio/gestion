@@ -5,10 +5,15 @@ const clients = {
     try {
       const client = req.body;
 
-      const userFound = await Clientes.findOne({ cuit: client.cuit });
+      const userFound = await Clientes.findOne({where:{ cuit: client.cuit}, paranoid:false });
 
       if (userFound) {
-        return res.status(409).json("Client Already Exist");
+        if (userFound.deletedAt) {
+        return res.status(409).json("Client Already Exist please Restore User");
+        } else {
+          return res.status(409).json("Client Already Exist");
+        }
+
       }
       const newClient = await Clientes.create({
         cuit: client.cuit,
@@ -25,7 +30,7 @@ const clients = {
         .status(200)
         .json(`Client ${newClient.nombre} Created Successfully`);
     } catch (error) {
-      return res.status(500).json(error);
+      return res.status(500).json('error '+ error);
     }
   },
 
@@ -39,7 +44,7 @@ const clients = {
   },
   findClient: async (req, res) => {
     try {
-      const client = await Clientes.findOne(req.query);
+      const client = await Clientes.findOne({where: req.query});
       res.status(200).json(client);
     } catch (error) {
       res.status(500).json(error);
@@ -48,12 +53,16 @@ const clients = {
 
   delClient: async (req, res) => {
     const client = req.params.cuit;
-    const userFound = await Clientes.findByPk({ cuit: client });
+    
     try {
-      if (!userFound) {
+      if (!client) {
         res.json(401).json("Client not found");
       } else {
-        await userFound.destroy();
+        await Clientes.destroy({
+          where: {
+            cuit: client
+          }
+        });
         res.status(204).json("client deleted successfully");
       }
     } catch (error) {

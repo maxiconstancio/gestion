@@ -4,11 +4,15 @@ module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('Clientes', {
       id: {
-        type: Sequelize.INTEGER,
+        allowNull: false,
+        autoIncrement: true,
+        primaryKey: true,
+        type: Sequelize.INTEGER
       },
       cuit: {
+        unique:true,
+        allowNull: false,
         type: Sequelize.BIGINT,
-        primaryKey:true,
       },
       tipoDoc: {
         type: Sequelize.STRING
@@ -43,7 +47,7 @@ module.exports = {
         type: Sequelize.DATE
       },
       deletedAt: {
-        allowNull: false,
+        allowNull: true,
         type: Sequelize.DATE
       }
     });

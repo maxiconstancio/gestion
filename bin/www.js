@@ -6,13 +6,15 @@
 
 var app = require('../app');
 var debug = require('debug')('gestion:server');
+var fs = require('fs');
 var http = require('http');
+var path = require('path')
 
 /**
  * Get port from environment and store in Express.
  */
 
-var port = normalizePort(process.env.PORT || '3000');
+var port = normalizePort(process.env.PORT || '5000');
 app.set('port', port);
 
 /**
@@ -20,11 +22,11 @@ app.set('port', port);
  */
 
 var server = http.createServer(app);
-
+ const pem = fs.readFileSync(path.resolve()+process.env.FILE_PEM, "utf-8");
+ const key = fs.readFileSync(path.resolve()+process.env.FILE_KEY, "utf-8");
 /**
  * Listen on provided port, on all network interfaces.
  */
-
 server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
@@ -88,3 +90,5 @@ function onListening() {
     : 'port ' + addr.port;
   console.log('Listening on ' + bind);
 }
+
+module.exports = {key, pem}
