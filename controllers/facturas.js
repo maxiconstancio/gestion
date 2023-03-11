@@ -11,12 +11,21 @@ const {
   FEPtosVenta,
 } = require("../services/afip/wsfe");
 const getQR = require("../services/afip/qr");
+const { validationResult } = require("express-validator");
+
+function dateString(fecha) {
+  return (new Date(fecha)).getFullYear().toString() + ((new Date(fecha)).getMonth() +1).toString().padStart(2,0) + (new Date(fecha)).getDate().toString().padStart(2,0)
+}
+
 
 const facturas = {
+  
+
   
   createFacturas: async (req, res) => {
     try {
       
+          
       const body = req.body; 
       
       const cliente = await Clientes.findOne({
@@ -25,11 +34,18 @@ const facturas = {
       if (!cliente) return res.status(409).json("Client No Exist");
       
       
-      const strFech = (new Date(body.cbteFech)).getFullYear().toString() + ((new Date(body.cbteFech)).getMonth() +1).toString().padStart(2,0) + (new Date(body.cbteFech)).getDate().toString().padStart(2,0)
-      const FchServDesde = body.fchServDesde ? (new Date(body.fchServDesde)).getFullYear().toString() + ((new Date(body.fchServDesde)).getMonth() +1).toString().padStart(2,0) + (new Date(body.fchServDesde)).getDate().toString().padStart(2,0) : null
-      const FchServHasta = body.fchServHasta ? (new Date(body.fchServHasta)).getFullYear().toString() + ((new Date(body.fchServHasta)).getMonth() +1).toString().padStart(2,0) + (new Date(body.fchServHasta)).getDate().toString().padStart(2,0) : null
-      const FchVtoPago = body.fchVtoPago ? (new Date(body.fchVtoPago)).getFullYear().toString() + ((new Date(body.fchVtoPago)).getMonth() +1).toString().padStart(2,0) + (new Date(body.fchVtoPago)).getDate().toString().padStart(2,0) : null
-      
+      const strFech = dateString(body.cbteFech);
+      const FchServDesde = body.fchServDesde ? dateString(body.fchServDesde) : null
+      const FchServHasta = body.fchServHasta ? dateString(body.fchServHasta) : null
+      const FchVtoPago = body.fchVtoPago ? dateString(body.fchVtoPago) : null
+     
+
+      let cbteAsoc = ""
+      if (body.cbteAsoc === undefined ) {
+        cbteAsoc = null;
+      } else {
+        cbteAsoc = [body.cbteAsoc]
+      }
       /* if (body.tipoCbte === '12' || body.tipoCbte === '13') {
         
         <ar:Tipo>short</ar:Tipo>
@@ -44,6 +60,7 @@ Si el comprobante es Debito o Credito, enviar estructura CbteAsoc o PeriodoAsoc.
 
 
       //Genera CAE Autorizado
+      
       const comp =
         (await FECompUltimoAutorizado(
           { Token: body.Token, Sign: body.Sign, Cuit: cuit },
@@ -61,16 +78,19 @@ Si el comprobante es Debito o Credito, enviar estructura CbteAsoc o PeriodoAsoc.
         CbteFech: strFech,
         ImpTotal: body.impTotal,
         tipoComprobante: body.tipoComprobante,
-        fchServDesde: FchServDesde,
-        fchServHasta: FchServHasta,
-        fchVtoPago: FchVtoPago,
-        cbteAsoc: body.cbteAsoc
+        FchServDesde: FchServDesde,
+        FchServHasta: FchServHasta,
+        FchVtoPago: FchVtoPago,
+        cbteAsoc: cbteAsoc
       };
-
+      
       try {
+       
+
         const CAEResult = await FECAESolicitar(data);
         
-        
+        if (data.ImpTotal <= 0) return res.status(500).json('Importe total no puede ser igual o menor a 0 ')
+
         if (CAEResult[0].FECAESolicitarResult.hasOwnProperty("Errors")) {
          
           return res
@@ -81,18 +101,20 @@ Si el comprobante es Debito o Credito, enviar estructura CbteAsoc o PeriodoAsoc.
           data.CAE = CAEResult[0].FECAESolicitarResult.FeDetResp.FECAEDetResponse[0].CAE;
 
           if (!data.CAE) {
-
-            res.status(500).json('Error al generar Autorizacion CAE') 
+              
+            res.status(500).json(CAEResult[0].FECAESolicitarResult.FeDetResp.FECAEDetResponse[0].Observaciones.Obs) 
 
           }
           
           const CAEVto = (CAEResult[0].FECAESolicitarResult.FeDetResp.FECAEDetResponse[0].CAEFchVto);
           data.CAEVto  = new Date (CAEVto.substring(0,4), CAEVto.substring(4,6)-1, CAEVto.substring(6,8) )
+          
           if (CAEResult[0].FECAESolicitarResult.FeDetResp.FECAEDetResponse[0].Resultado === 'A') {
+            
            await Facturas.create({
             cuit: cliente.cuit,
             ClienteId: cliente.id,
-            ptoVenta: data.ptoVenta, // ej: DNI, CUIT, CUIL, etc
+            ptoVenta: data.ptoVenta, 
             nroComprobante: data.Cbte,
             fechaComprobante: body.cbteFech,
             neto: data.ImpTotal,
@@ -111,7 +133,7 @@ Si el comprobante es Debito o Credito, enviar estructura CbteAsoc o PeriodoAsoc.
             fchServHasta: body.fchServHasta,
             fchVtoPago: body.fchVtoPago,
             concepto: body.concepto,
-            //Agregar en back campo CbteAsoc.
+            ctesAsoc: body.cbteAsoc
           });
           
           data.QR = (getQR(data, cuit))
@@ -119,14 +141,14 @@ Si el comprobante es Debito o Credito, enviar estructura CbteAsoc o PeriodoAsoc.
             .status(200)
             .json({data, cliente});
         } else {
-          return (new Error ("error al solicitar CAE" + error));
+          return new Error (CAEResult[0].FECAESolicitarResult.FeDetResp.FECAEDetResponse[0].Observaciones.Obs)
         }
       }
       } catch (error) {
-        return (new Error ("error al solicitar CAE" + error));
+        return (res.status(500).json("error al solicitar CAE" + error));
       }
     } catch (error) {
-      return res.status(500).json("hay un error " + error);
+      return res.status(500).json( error);
     }
   },
 

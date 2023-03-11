@@ -36,7 +36,7 @@ module.exports = (sequelize, DataTypes) => {
     fchServHasta: DataTypes.DATE,
     fchVtoPago: DataTypes.DATE,
     concepto: DataTypes.INTEGER,
-    cbtesAsoc: DataTypes.JSON,
+    ctesAsoc: DataTypes.JSON,
   }, {
     sequelize,
     modelName: 'Facturas',

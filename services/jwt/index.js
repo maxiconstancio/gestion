@@ -1,6 +1,10 @@
 import jwt from 'jsonwebtoken';
 import { config } from 'dotenv';
-config();
+if (process.env.NODE_ENV === 'production') {
+  config({ path: 'prod.env' });
+} else {
+  config();
+}
 const jwtSecret = process.env.JWT_SECRET;
 
 

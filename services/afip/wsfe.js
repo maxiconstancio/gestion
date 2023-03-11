@@ -1,5 +1,5 @@
 const soap = require ('soap');
-const url =  "https://wswhomo.afip.gov.ar/wsfev1/service.asmx?WSDL";
+const url =  process.env.URL_WSFE;
 
 async function FEPtosVenta(auth, ptoVenta, cbteTipo) {
 
@@ -32,9 +32,10 @@ async function FECompUltimoAutorizado(auth, ptoVenta, cbteTipo) {
   try {
     let client = await soap.createClientAsync(url);
     let result = await client.FECompUltimoAutorizadoAsync(args);
+    
     //Revisar cuando da error porque no salta el catch
     return (result[0].FECompUltimoAutorizadoResult.CbteNro);
-
+    
   } catch (error) {
     return (error);
 
@@ -45,23 +46,23 @@ const FECAESolicitar = async  (data) => {
   
 
     const auth = data.Auth;
-
+    
     const FECAEDetRequest = { Concepto: data.Concepto, DocTipo: data.DocTipo, 
       DocNro: data.DocNro, CbteDesde: data.Cbte, CbteHasta: data.Cbte, CbteFch: data.CbteFech, ImpTotal: data.ImpTotal, ImpTotConc:0.00,
       ImpNeto:data.ImpTotal,
       ImpOpEx:0,
       ImpTrib:0,
       ImpIVA:0,
+      FchServDesde: data.FchServDesde,
+      FchServHasta:  data.FchServHasta,
+      FchVtoPago: data.FchVtoPago,      
       MonId:"PES",
       MonCotiz:1,
-      FchServDesde: data.fchServDesde,
-      FchServHasta: data.fchServHasta,
-      FchVtoPago: data.fchVtoPago,
-      CbtesAsoc: {CbteAsoc: data.cbteAsoc}
+      
+      //CbtesAsoc: {CbteAsoc: data.cbteAsoc}
       }
-    
-    if (data.cbteTipo === 12 || data.cbteTipo === 13) FECAEDetRequest.CbtesAsoc ={CbteAsoc: data.CbteAsoc} 
-    
+     if (data.cbteTipo === 12 || data.cbteTipo === 13) FECAEDetRequest.CbtesAsoc ={CbteAsoc: data.cbteAsoc} 
+     
     let args =  {Auth: auth, FeCAEReq: {FeCabReq: { CantReg: 1, PtoVta: data.ptoVenta, CbteTipo: data.cbteTipo}, FeDetReq: { FECAEDetRequest: FECAEDetRequest }}};
      
      try {
@@ -87,7 +88,7 @@ const ListarComprobantes = async ( auth) => {
     
     return result
   } catch (error) {
-    
+     console.log(error)
   }
 }
 

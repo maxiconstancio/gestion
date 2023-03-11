@@ -2,6 +2,7 @@ const express = require('express');
 
 const {createFacturas, findFactura, getAllFacturas, delFactura, queryDateFC, getWsaa, getUltComprobante, getPtoVenta} = require('../controllers/facturas.js');
 
+
 const router = express.Router();
 
 
