@@ -88,7 +88,7 @@ function onListening() {
   var bind = typeof addr === 'string'
     ? 'pipe ' + addr
     : 'port ' + addr.port;
-  console.log('Listening on ' + bind + ' in' + process.env.NODE_ENV);
+  console.log('Listening on ' + bind );
 }
 
 module.exports = {key, pem}

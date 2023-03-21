@@ -28,7 +28,7 @@ const clients = {
       });
       return res
         .status(200)
-        .json(`Client ${newClient.nombre} Created Successfully`);
+        .json(newClient);
     } catch (error) {
       return res.status(500).json('error '+ error);
     }

@@ -71,6 +71,7 @@ const wsaa = async (_service) => {
   
   } catch (error) {
     if (error) {
+      console.log(error)
       return {error};
     }
   }

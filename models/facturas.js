@@ -37,6 +37,7 @@ module.exports = (sequelize, DataTypes) => {
     fchVtoPago: DataTypes.DATE,
     concepto: DataTypes.INTEGER,
     ctesAsoc: DataTypes.JSON,
+    QR: DataTypes.JSON,
   }, {
     sequelize,
     modelName: 'Facturas',

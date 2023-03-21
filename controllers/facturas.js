@@ -69,7 +69,7 @@ Si el comprobante es Debito o Credito, enviar estructura CbteAsoc o PeriodoAsoc.
         )) + 1;
       const data = {
         Auth: { Token: body.Token, Sign: body.Sign, Cuit: cuit },
-        ptoVenta: body.ptoVenta,
+        ptoVenta: parseInt(body.ptoVenta),
         cbteTipo: body.tipoComprobante,
         Concepto: body.concepto,
         DocTipo: body.docTipo,
@@ -105,7 +105,7 @@ Si el comprobante es Debito o Credito, enviar estructura CbteAsoc o PeriodoAsoc.
             res.status(500).json(CAEResult[0].FECAESolicitarResult.FeDetResp.FECAEDetResponse[0].Observaciones.Obs) 
 
           }
-          
+          data.QR = getQR(data, cuit)
           const CAEVto = (CAEResult[0].FECAESolicitarResult.FeDetResp.FECAEDetResponse[0].CAEFchVto);
           data.CAEVto  = new Date (CAEVto.substring(0,4), CAEVto.substring(4,6)-1, CAEVto.substring(6,8) )
           
@@ -133,10 +133,10 @@ Si el comprobante es Debito o Credito, enviar estructura CbteAsoc o PeriodoAsoc.
             fchServHasta: body.fchServHasta,
             fchVtoPago: body.fchVtoPago,
             concepto: body.concepto,
-            ctesAsoc: body.cbteAsoc
+            ctesAsoc: body.cbteAsoc,
+            QR: data.QR
           });
           
-          data.QR = (getQR(data, cuit))
           return res
             .status(200)
             .json({data, cliente});
@@ -181,7 +181,7 @@ Si el comprobante es Debito o Credito, enviar estructura CbteAsoc o PeriodoAsoc.
         include: [
           {
             model: Clientes,
-            attributes: ["cuit", "nombre"],
+            attributes: ["cuit", "nombre", "condIva", "domicilio", "ciudad", "provincia", "tipoDoc"],
           },
         ],
       });
