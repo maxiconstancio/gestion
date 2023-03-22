@@ -9,6 +9,7 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var clientesRouter = require('./routes/clientes');
 var facturasRouter = require('./routes/facturas');
+var whatsappRouter = require('./routes/whatsapp');
 const { appendFileSync } = require('fs');
 
 var app = express();
@@ -28,6 +29,7 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/clientes', clientesRouter);
 app.use('/facturas', facturasRouter);
+app.use('/whatsapp', whatsappRouter);
 
 app.get('/', function(req, res) {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
